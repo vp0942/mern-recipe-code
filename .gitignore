@@ -112,3 +112,6 @@ dist/
 .yarn/plugins
 .yarn/sdks
 .yarn/versions
+
+# WebStorm project files
+.idea/
