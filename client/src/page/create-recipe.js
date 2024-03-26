@@ -47,7 +47,7 @@ export const CreateRecipe = () => {
     });
   }
 
-  console.log(recipe);
+  // console.log(recipe);
 
   // The Add Ingredient button must be of type button to prevent the form from being submitted!!!
   return (
