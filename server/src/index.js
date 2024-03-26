@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import 'dotenv/config';
 
 import { usersRouter } from './routes/users.js';
+import { recipesRouter } from './routes/recipes.js';
 
 
 const app = express(); // To generate a version of our API
@@ -13,7 +14,11 @@ const app = express(); // To generate a version of our API
 app.use(express.json()); // To parse JSON data
 app.use(cors()); // To allow requests from any origin
 
-app.use("/auth", usersRouter); // To use our usersRouter from "user.js" for any requests to /auth
+// To use our usersRouter from "user.js" for POST requests to /auth/login or /auth/register
+app.use("/auth", usersRouter);
+// To use our usersRouter from "recipes.js" for requests to /recipes/...
+app.use("/recipes", recipesRouter);
+
 
 // Connect to our MongoDB database
 mongoose.connect(process.env.BASE_URL);
