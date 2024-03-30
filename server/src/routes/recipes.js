@@ -1,6 +1,7 @@
 import express from "express";
 import {RecipeModel} from "../models/Recipes.js";
 import {UserModel} from "../models/Users.js";
+import { verifyToken } from "./users.js";
 
 const router = express.Router();
 
@@ -17,7 +18,10 @@ router.get("/", async (req, res) => {
 });
 
 // Create a new recipe
-router.post("/", async (req, res) => {
+// We added the verifyToken middleware to check if the user is authenticated
+// verifyToken will prevent users from creating a new recipe if they are not logged in
+// the async function will not be executed if the user is not authenticated
+router.post("/", verifyToken, async (req, res) => {
   // Create a new recipe using the RecipeModel and the request body
   const recipe = new RecipeModel(req.body);
   try {
@@ -30,7 +34,8 @@ router.post("/", async (req, res) => {
 });
 
 // Save a recipe - by adding the recipeId to the user's savedRecipes array and updating the database
-router.put("/", async (req, res) => {
+// We added the verifyToken middleware to check if the user is authenticated
+router.put("/", verifyToken, async (req, res) => {
 
   // we need to get {userId, recipeId} from the request body in order to add the recipeId to the user's savedRecipes array
   // before updating the database
@@ -41,7 +46,7 @@ router.put("/", async (req, res) => {
     // push the recipeId to the user's savedRecipes array
     user.savedRecipes.push(recipe);
     await user.save();
-    res.status(201).json({sevedRecipes: user.savedRecipes});
+    res.status(201).json({savedRecipes: user.savedRecipes});
   } catch (err) {
     res.status(500).json({message: err.message});
   }
@@ -60,15 +65,16 @@ router.get("/savedRecipes/ids/:userID", async (req, res) => {
 });
 
 // Get all recipes saved by the logged user
-router.get("/savedRecipes", async (req, res) => {
+router.get("/savedRecipes/:userID", async (req, res) => {
   try {
     // Find the user whose _id is in the request body
-    const user = await UserModel.findById(req.body.userID);
+    const user = await UserModel.findById(req.params.userID);
 
     // Find all recipes whose _id is in the user's savedRecipes array
     const savedRecipes = await RecipeModel.find({_id: {$in: user?.savedRecipes}});
+    // console.log("savedRecipes: ",savedRecipes);
 
-    res.status(201).json(savedRecipes);
+    res.status(201).json({savedRecipes});
   } catch (err) {
     res.status(500).json({message: err.message});
   }

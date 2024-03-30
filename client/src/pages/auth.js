@@ -39,7 +39,7 @@ const Login = () => {
       });
 
       // We can see the response in the console
-      console.log("response", response);
+      // console.log("response", response);
 
       // Set the cookie with the token that we got from the server
       setCookies("access_token", response.data.token);

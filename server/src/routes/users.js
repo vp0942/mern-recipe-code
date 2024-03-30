@@ -52,6 +52,32 @@ router.post("/login", async (req, res) => {
   res.json({token, userID: user._id});
 });
 
-
-
 export {router as usersRouter};
+
+
+
+// Middleware to verify the token
+export const verifyToken = (req, res, next) => {
+
+  // Get the token from the request headers
+  // We assume that the token is in the "Authorization" header of the request from the frontend
+  // Then we will use verifyToken as middleware in the important routes that require authentication!!!
+  const token = req.headers.authorization;
+  if (token) {
+    // Verify the token
+    jwt.verify(token, process.env.JWT_SECRET, (err) => {
+      if (err) {
+        // If the token is invalid, return an error 403 (Forbidden)
+        return res.sendStatus(403);
+      }
+      // If the token is valid, call the next middleware
+      // and allow the request to continue
+      next();
+    });
+  } else {
+    // If tno token was sent to the server, return an error 401 (Unauthorized)
+    res.sendStatus(401);
+  }
+}
+
+
